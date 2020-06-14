@@ -1,5 +1,5 @@
 # Computer Pointer Controller
-This project is an application that controls the computer pointer with the use of human eye gaze direction. It supports input from video file and camera video stream. 
+In this project we will controls the computer pointer with the use of Face direction. It supports input from video file and camera video stream. 
 
 ## Project Set Up and Installation
 **First step**
@@ -14,58 +14,23 @@ source /opt/intel/openvino/bin/setupvars.sh
 You have to run the above command every time you open an new terminal window.
 We need the following models
 - [Face Detection Model](https://docs.openvinotoolkit.org/latest/_models_intel_face_detection_adas_binary_0001_description_face_detection_adas_binary_0001.html)
-- [Facial Landmarks Detection Model](https://docs.openvinotoolkit.org/latest/_models_intel_landmarks_regression_retail_0009_description_landmarks_regression_retail_0009.html)
-- [Head Pose Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_head_pose_estimation_adas_0001_description_head_pose_estimation_adas_0001.html)
-- [Gaze Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_gaze_estimation_adas_0002_description_gaze_estimation_adas_0002.html)
 
 To download them run the following commands after you have created a folder with name `model` and got into it.
 **Face Detection Model**
 ```bash
 $ python3 /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "face-detection-adas-binary-0001"
 ```
-**Facial Landmarks Detection**
-```bash
-$ python3 /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "landmarks-regression-retail-0009"
-```
-**Head Pose Estimation**
-```bash
-$ python3 /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "head-pose-estimation-adas-0001"
-```
-**Gaze Estimation Model**
-```bash
-$ python3 /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "gaze-estimation-adas-0002"
-```
-
 **Third step**
 Install the requirements:
 ```bash
 $ pip3 install -r requirements.txt
 ```
 
-**Project structure**
-```bash
-|
-|--demo.mp4
-|--model
-    |--intel
-        |--face-detection-adas-binary-0001
-        |--gaze-estimation-adas-0002
-        |--head-pose-estimation-adas-0001
-        |--landmarks-regression-retail-0009
-|--face_detection.py
-|--facial_landmarks_detection.py
-|--gaze_estimation.py
-|--input_feeder.py
-|--main.py
-|--mouse_controller.py
-|--README.md
-|--requirements.txt
-```
 
 ## Demo
 To run the application use the following command
 ```bash
-$ python3 main.py -f model/intel/face-detection-adas-binary-0001/FP32-INT1/face-detection-adas-binary-0001.xml -fl model/intel/landmarks-regression-retail-0009/FP32/landmarks-regression-retail-0009.xml -hp model/intel/head-pose-estimation-adas-0001/FP32/head-pose-estimation-adas-0001.xml -g model/intel/gaze-estimation-adas-0002/FP32/gaze-estimation-adas-0002.xml -i demo.mp4
+$ python3 main.py -f model/intel/face-detection-adas-binary-0001/FP32-INT1/face-detection-adas-binary-0001.xml -fl -i demo.mp4
 ```
 
 ## Documentation
@@ -117,29 +82,9 @@ The results are the following
   - The total inference time is : 1.259327sec
   - The total FPS is : 9.445078fps
   
-- FP16:
-  - The total model loading time is : 0.83298sec
-  - The total inference time is : 1.086544sec
-  - The total FPS is : 9.923655fps
-  
-- INT8:
-  - The total model loading time is : 0,870566sec
-  - The total inference time is : 1.023654sec
-  - The total FPS is : 9.954624fps
-
-I also ran the model on an INtel HD Graphics 620 and the results are the following
-- FP32:
-  - The total model loading time is : 15.65994sec
-  - The total inference time is : 12.032688sec
-  - The total FPS is : 2.47852fps
-  
-- FP16:
-  - The total model loading time is : 16.233607sec
-  - The total inference time is : 12.24576sec
-  - The total FPS is : 2.755961fps
 
 ## Results
-As we can see from the above results, models with lower precision gives us better inference time but they loose in accuracy. This happens because lower precision model uses less memory and they are less computationally expensive.
+As we can see the results, models with lower precision gives us better inference time but they loose in accuracy. This happens because lower precision model uses less memory and they are less computationally expensive.
 
 ## Stand Out Suggestions
 I tried different precision to models to improve inference time and accuracy. Also i am allowing user to select video or camera as input file to the application.
@@ -154,15 +99,3 @@ There are several edge cases that can be experienced while running inference on 
 2. No head detected in the frame
 
    In this case application skips the frame and informs the user.
-
-
-## License:
-MIT License
-
-Copyright (c) 2020 George Koukouris
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
