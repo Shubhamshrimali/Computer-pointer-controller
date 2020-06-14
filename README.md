@@ -46,12 +46,6 @@ optional arguments:
   -h, --help            show this help message and exit
   -f FACEDETECTIONMODEL, --facedetectionmodel FACEDETECTIONMODEL
                         Path to .xml file of Face Detection model.
-  -fl FACIALLANDMARKMODEL, --faciallandmarkmodel FACIALLANDMARKMODEL
-                        Path to .xml file of Facial Landmark Detection model.
-  -hp HEADPOSEMODEL, --headposemodel HEADPOSEMODEL
-                        Path to .xml file of Head Pose Estimation model.
-  -g GAZEESTIMATIONMODEL, --gazeestimationmodel GAZEESTIMATIONMODEL
-                        Path to .xml file of Gaze Estimation model.
   -i INPUT, --input INPUT
                         Path to video file or enter cam for webcam
   -flags PREVIEWFLAGS [PREVIEWFLAGS ...], --previewFlags PREVIEWFLAGS [PREVIEWFLAGS ...]
