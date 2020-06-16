@@ -8,9 +8,9 @@ import numpy as np
 from openvino.inference_engine import IECore
 
 
-class Model_Face_Detection:
+class Model_Head_Pose_Estimation:
     '''
-    Class for the Face Detection Model.
+    Class for the Head Pose Estimation Model.
     '''
     def __init__(self, model_name, device='CPU', extensions=None):
         self.model_name = model_name
@@ -33,58 +33,49 @@ class Model_Face_Detection:
         If your model requires any Plugins, this is where you can load them.
         '''
         self.plugin = IECore()
-        self.network = self.plugin.read_network(model = self.model_structure, weights = self.model_weights)
-        
-        supported_frame = self.plugin.query_network(network = self.network, device_name = self.device)
+        self.network = self.plugin.read_network(model=self.model_structure, weights=self.model_weights)
 
+        supported_frame = self.plugin.query_network(network=self.network,device_name=self.device)
         unsupported_frame = [l for l in self.network.layers.keys() if l not in supported_frame]
-        
+
         if len(unsupported_frame) != 0 and self.device == 'CPU':
             print("unsupported layers found:{}".format(unsupported_frame))
             
             if not self.extensions == None:
                 print("Adding cpu_extension")
-                
+
                 self.plugin.add_extension(self.extensions, self.device)
                 
-                supported_frame = self.plugin.query_network(network = self.network, device_name = self.device)
+                supported_frame = self.plugin.query_network(network=self.network, device_name=self.device)
                 unsupported_frame = [l for l in self.network.layers.keys() if l not in supported_frame]
                 
-                if len(unsupported_frame) != 0:
+                if len(unsupported_frame)!=0:
                     print("Issue still exists")
                     exit(1)
-                
+
                 print("Issue resolved after adding extensions")
             else:
                 print("provide path of cpu extension")
                 exit(1)
 
-        self.exec_net = self.plugin.load_network(network = self.network, device_name = self.device, num_requests = 1)
+        self.exec_net = self.plugin.load_network(network=self.network,device_name=self.device,num_requests=1)
         self.input_name = next(iter(self.network.inputs))
         self.input_shape = self.network.inputs[self.input_name].shape
         self.output_name = next(iter(self.network.outputs))
         self.output_shape = self.network.outputs[self.output_name].shape
 
-    def predict(self, image, prob_threshold):
+    def predict(self, image):
         '''
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
         '''
         img_processed = self.preprocess_input(image.copy())
+        
         outputs = self.exec_net.infer({self.input_name : img_processed})
-        coords = self.preprocess_output(outputs, prob_threshold)
         
-        if (len(coords) == 0):
-            return 0, 0
-
-        coords = coords[0] 
-        height = image.shape[0]
-        weight = image.shape[1]
-        coords = coords* np.array([weight, height, weight, height])
-        coords = coords.astype(np.int32)
+        result = self.preprocess_output(outputs)
         
-        cropped_face = image[coords[1]:coords[3], coords[0]:coords[2]]
-        return cropped_face, coords
+        return result
 
     def check_model(self):
         pass
@@ -95,26 +86,20 @@ class Model_Face_Detection:
         you might have to preprocess it. This function is where you can do that.
         '''
         image_resized = cv2.resize(image, (self.input_shape[3], self.input_shape[2]))
-        img_processed = np.transpose(np.expand_dims(image_resized, axis = 0), (0, 3, 1, 2))
+
+        img_processed = np.transpose(np.expand_dims(image_resized, axis=0), (0,3,1,2))
         
         return img_processed
         
-    def preprocess_output(self, outputs, prob_threshold):
+    def preprocess_output(self, outputs):
         '''
         Before feeding the output of this model to the next model,
         you might have to preprocess the output. This function is where you can do that.
         '''
-        coords = []
-        outputs = outputs[self.output_name][0][0]
-        for output in outputs:
-            conf = output[2]
-            
-            if conf >= prob_threshold:
-                x = output[3]
-                y = output[4]
-                z = output[5]
-                v = output[6]
-            
-                coords.append([x, y, z, v])
-        
-        return coords
+        outs = []
+
+        outs.append(outputs['angle_y_fc'].tolist()[0][0])
+        outs.append(outputs['angle_p_fc'].tolist()[0][0])
+        outs.append(outputs['angle_r_fc'].tolist()[0][0])
+
+        return outs
